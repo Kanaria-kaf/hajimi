@@ -25,8 +25,6 @@ async def process_nonstream_request(
 ):
     """处理非流式API请求"""
     gemini_client = GeminiClient(current_api_key)
-    if settings.PUBLIC_MODE:
-        settings.MAX_RETRY_NUM = 3
     # 创建调用 Gemini API 的主任务
     gemini_task = asyncio.create_task(
         gemini_client.complete_chat(
@@ -86,8 +84,6 @@ async def process_request(
             extra={'request_type': 'non-stream', 'model': chat_request.model, 'cache_operation': 'hit_and_remove'})
         return openAI_from_Gemini(cached_response,stream=False)
 
-    # 重置已尝试的密钥
-    await key_manager.reset_tried_keys_for_request()
     # 设置初始并发数
     current_concurrent = settings.CONCURRENT_REQUESTS
     max_retry_num = settings.MAX_RETRY_NUM
